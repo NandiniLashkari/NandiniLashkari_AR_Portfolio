@@ -3,243 +3,228 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nandini Lashkari — Immersive Tech Portfolio (WebAR)</title>
+  <title>Nandini Lashkari — Immersive Tech Portfolio (Markerless WebAR)</title>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/mayognaise/aframe-gesture-handler@master/dist/aframe-gesture-handler.min.js"></script>
-  <script src="https://jeromeetienne.github.io/AR.js/aframe/build/aframe-ar-nft.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-  <!-- We use markerless (imageTargets) with a dummy flat image so it works as surface detection on most devices -->
   <style>
-    body { margin:0; overflow:hidden; background:#000; }
-    .arjs-loader { height: 100vh; width: 100vw; position: absolute; top: 0; left: 0; background:rgba(0,0,0,0.95); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column; }
-    .arjs-loader div { color:white; font-size:2em; }
-    .hint { position:absolute; bottom:20px; left:0; width:100%; text-align:center; color:white; font-family:Arial; z-index:100; }
+    body { margin: 0; overflow: hidden; background: #000; font-family: Arial, sans-serif; }
+    #loader { 
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.95); display: flex; flex-direction: column; 
+      justify-content: center; align-items: center; color: #0ff; z-index: 10; 
+      text-align: center; 
+    }
+    #loader.hidden { display: none; }
+    #enter-ar { 
+      background: rgba(0,255,255,0.2); border: 2px solid #0ff; color: #0ff; 
+      padding: 15px 30px; border-radius: 10px; font-size: 18px; cursor: pointer; 
+      margin-top: 20px; 
+    }
+    #hint { position: absolute; bottom: 20px; left: 0; width: 100%; text-align: center; color: #0ff; z-index: 5; }
+    .holo-glow { text-shadow: 0 0 10px #0ff; }
   </style>
 </head>
 <body>
-  <div class="arjs-loader">
-    <div>Point your phone at a flat surface</div>
-    <div>Loading WebAR Portfolio...</div>
+  <div id="loader">
+    <div style="font-size: 24px; margin-bottom: 10px;">Nandini Lashkari</div>
+    <div style="font-size: 18px; margin-bottom: 20px;">Immersive Tech Portfolio</div>
+    <div>Point at a flat surface to place the holographic panel</div>
+    <button id="enter-ar" onclick="enterAR()">Enter AR</button>
   </div>
+  <div id="hint" class="holo-glow">Tap buttons to explore</div>
 
   <a-scene
-    mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/examples/image-tracking/assets/card/example-soft.jpg; filterMinCF:0.0001; filterBeta:0.001; warmupTolerance:5; missTolerance:10;"
     embedded
-    renderer="colorManagement: true, physicallyCorrectLights: true"
-    vr-mode-ui="enabled: false"
+    xr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false"
-    gesture-detector
+    background="color: #000"
+    fog="type: linear; color: #000; near: 10; far: 15"
+    raycaster="objects: .raycastable; far: 10; interval: 0"
+    cursor="rayOrigin: mouse; fuse: false"
+    loading-screen="enabled: false"
   >
-    <a-assets timeout="60000">
-      <a-asset-item id="avatar" src="https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/LeePerrySmith/LeePerrySmith.glb"></a-asset-item>
-      <img id="github" src="https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/github.png">
-      <img id="linkedin" src="https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/linkedin.png">
-      <img id="mail" src="https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/email.png">
-    </a-assets>
+    <!-- Assets (simple primitives, no external loads) -->
+    <a-assets></a-assets>
 
-    <!-- Camera -->
-    <a-camera position="0 1.6 0" look-controls="enabled: false"></a-camera>
-
-    <!-- Markerless anchor (surface) -->
-    <a-entity mindar-image-target="#anchor0">
-      <!-- Main Holographic Control Panel (placed on detected surface) -->
-      <a-entity position="0 0.01 0" rotation="-90 0 0">
-        <!-- Panel Base (glowing cyan) -->
-        <a-plane
-          id="panel"
-          position="0 0 0"
-          width="1.2" height="0.8"
-          material="color:#0ff; opacity:0.15; transparent:true; side:double; emissive:#0ff; emissiveIntensity:0.6"
-          animation__pulse="property: material.emissiveIntensity; from:0.4; to:0.9; dur:2000; dir:alternate; loop:true"
-        ></a-plane>
-
-        <!-- 5 Interactive Buttons -->
-        <!-- Button 1: Profile -->
-        <a-entity
-          class="button"
-          data-section="profile"
-          position="-0.4 0.25 0.01"
-          geometry="primitive:plane; width:0.35; height:0.12"
-          material="color:#0ff; opacity:0.2; transparent:true; side:double"
-          text="value:PROFILE; align:center; color:#fff; width:6"
-          animation__hover="property: material.opacity; to:0.6; dur:200; startEvents:mouseenter"
-          animation__leave="property: material.opacity; to:0.2; dur:200; startEvents:mouseleave"
-          gesture-handler
-        ></a-entity>
-
-        <!-- Button 2: Experience -->
-        <a-entity
-          class="button"
-          data-section="experience"
-          position="-0.4 0.05 0.01"
-          geometry="primitive:plane; width:0.35; height:0.12"
-          material="color:#0ff; opacity:0.2; transparent:true; side:double"
-          text="value:EXPERIENCE; align:center; color:#fff; width:6"
-          animation__hover="property: material.opacity; to:0.6; dur:200; startEvents:mouseenter"
-          animation__leave="property: material.opacity; to:0.2; dur:200; startEvents:mouseleave"
-          gesture-handler
-        ></a-entity>
-
-        <!-- Button 3: Projects -->
-        <a-entity
-          class="button"
-          data-section="projects"
-          position="-0.4 -0.15 0.01"
-          geometry="primitive:plane; width:0.35; height:0.12"
-          material="color:#0ff; opacity:0.2; transparent:true; side:double"
-          text="value:PROJECTS; align:center; color:#fff; width:6"
-          animation__hover="property: material.opacity; to:0.6; dur:200; startEvents:mouseenter"
-          animation__leave="property: material.opacity; to:0.2; dur:200; startEvents:mouseleave"
-          gesture-handler
-        ></a-entity>
-
-        <!-- Button 4: Skills -->
-        <a-entity
-          class="button"
-          data-section="skills"
-          position="0.4 0.25 0.01"
-          geometry="primitive:plane; width:0.35; height:0.12"
-          material="color:#0ff; opacity:0.2; transparent:true; side:double"
-          text="value:SKILLS; align:center; color:#fff; width:6"
-          animation__hover="property: material.opacity; to:0.6; dur:200; startEvents:mouseenter"
-          animation__leave="property: material.opacity; to:0.2; dur:200; startEvents:mouseleave"
-          gesture-handler
-        ></a-entity>
-
-        <!-- Button 5: Research -->
-        <a-entity
-          class="button"
-          data-section="research"
-          position="0.4 0.05 0.01"
-          geometry="primitive:plane; width:0.35; height:0.12"
-          material="color:#0ff; opacity:0.2; transparent:true; side:double"
-          text="value:RESEARCH; align:center; color:#fff; width:6"
-          animation__hover="property: material.opacity; to:0.6; dur:200; startEvents:mouseenter"
-          animation__leave="property: material.opacity; to:0.2; dur:200; startEvents:mouseleave"
-          gesture-handler
-        ></a-entity>
-      </a-entity>
-
-      <!-- Dynamic Content Container (appears above panel) -->
-      <a-entity id="content" position="0 0.8 0" visible="false">
-        <!-- Content will be injected here via JS -->
-      </a-entity>
-
+    <!-- Camera with hand controls for mobile taps -->
+    <a-entity id="rig" movement-controls>
+      <a-camera position="0 1.6 0"></a-camera>
+      <a-entity laser-controls="hand: right" raycaster="hand: right"></a-entity>
+      <a-entity laser-controls="hand: left" raycaster="hand: left"></a-entity>
     </a-entity>
 
-    <!-- Hint -->
-    <div class="hint">Tap the glowing buttons to explore</div>
+    <!-- Main Holographic Panel (anchored on detected plane) -->
+    <a-entity id="panel" visible="false" position="0 0 -2">
+      <!-- Glowing Base Plane -->
+      <a-plane
+        width="1.2" height="0.8"
+        material="color: #0ff; opacity: 0.2; transparent: true; side: double; emissive: #0ff; emissiveIntensity: 0.5"
+        animation="property: material.emissiveIntensity; to: 1; dir: alternate; dur: 2000; loop: true"
+      ></a-plane>
+
+      <!-- Interactive Buttons (raycastable for taps) -->
+      <a-plane
+        class="raycastable button" data-section="profile"
+        position="-0.4 0.25 0.01" rotation="-90 0 0"
+        width="0.35" height="0.12"
+        material="color: #0ff; opacity: 0.3; transparent: true"
+        text="value: Profile; align: center; color: #fff; width: 4"
+        animation__enter="property: material.opacity; to: 0.7; startEvents: rayenter"
+        animation__leave="property: material.opacity; to: 0.3; startEvents: rayleave"
+        event-set__click="_event: raycaster-intersection; _target: #content; visible: true"
+      ></a-plane>
+
+      <a-plane
+        class="raycastable button" data-section="experience"
+        position="-0.4 0.05 0.01" rotation="-90 0 0"
+        width="0.35" height="0.12"
+        material="color: #0ff; opacity: 0.3; transparent: true"
+        text="value: Experience; align: center; color: #fff; width: 4"
+        animation__enter="property: material.opacity; to: 0.7; startEvents: rayenter"
+        animation__leave="property: material.opacity; to: 0.3; startEvents: rayleave"
+      ></a-plane>
+
+      <a-plane
+        class="raycastable button" data-section="projects"
+        position="-0.4 -0.15 0.01" rotation="-90 0 0"
+        width="0.35" height="0.12"
+        material="color: #0ff; opacity: 0.3; transparent: true"
+        text="value: Projects; align: center; color: #fff; width: 4"
+        animation__enter="property: material.opacity; to: 0.7; startEvents: rayenter"
+        animation__leave="property: material.opacity; to: 0.3; startEvents: rayleave"
+      ></a-plane>
+
+      <a-plane
+        class="raycastable button" data-section="skills"
+        position="0.4 0.25 0.01" rotation="-90 0 0"
+        width="0.35" height="0.12"
+        material="color: #0ff; opacity: 0.3; transparent: true"
+        text="value: Skills; align: center; color: #fff; width: 4"
+        animation__enter="property: material.opacity; to: 0.7; startEvents: rayenter"
+        animation__leave="property: material.opacity; to: 0.3; startEvents: rayleave"
+      ></a-plane>
+
+      <a-plane
+        class="raycastable button" data-section="research"
+        position="0.4 0.05 0.01" rotation="-90 0 0"
+        width="0.35" height="0.12"
+        material="color: #0ff; opacity: 0.3; transparent: true"
+        text="value: Research; align: center; color: #fff; width: 4"
+        animation__enter="property: material.opacity; to: 0.7; startEvents: rayenter"
+        animation__leave="property: material.opacity; to: 0.3; startEvents: rayleave"
+      ></a-plane>
+
+      <!-- Content Display (above panel) -->
+      <a-entity id="content" position="0 0.5 0" visible="false">
+        <!-- Dynamic content injected via JS -->
+      </a-entity>
+    </a-entity>
+
+    <!-- Ambient Light for Holographic Glow -->
+    <a-light type="ambient" color="#0ff" intensity="0.3"></a-light>
   </a-scene>
 
   <script>
-    // Remove loader when AR is ready
-    document.querySelector('a-scene').addEventListener('arReady', () => {
-      document.querySelector('.arjs-loader').style.display = 'none';
+    const sceneEl = document.querySelector('a-scene');
+    const loader = document.getElementById('loader');
+    const panelEl = document.getElementById('panel');
+    const contentEl = document.getElementById('content');
+    const enterBtn = document.getElementById('enter-ar');
+
+    // Enter AR Mode
+    function enterAR() {
+      sceneEl.enterVR();
+      loader.classList.add('hidden');
+    }
+
+    // Plane Detection: Anchor panel on horizontal surface
+    sceneEl.addEventListener('xrplaneadd', (evt) => {
+      if (evt.detail.plane.geometry === 'horizontal') {  // Ground/floor/table
+        const planePose = evt.detail.plane.getPose();
+        panelEl.setAttribute('position', planePose.transform.position);
+        panelEl.setAttribute('rotation', { x: -90, y: 0, z: 0 });  // Lay flat
+        panelEl.object3D.visible = true;
+        document.getElementById('hint').style.display = 'block';
+      }
     });
 
-    const contentEl = document.querySelector('#content');
+    // Button Interactions (tap to show section)
+    sceneEl.addEventListener('click', (evt) => {
+      const clicked = evt.detail.el;
+      if (clicked.classList.contains('button')) {
+        const section = clicked.getAttribute('data-section');
+        showSection(section);
+      }
+    });
 
-    // Clear previous content
-    function clearContent() {
+    function showSection(section) {
       contentEl.innerHTML = '';
-      contentEl.setAttribute('visible', false);
-    }
-
-    // Show content
-    function showContent(html) {
-      contentEl.innerHTML = html;
       contentEl.setAttribute('visible', true);
+      contentEl.setAttribute('position', '0 0.5 0');
+
+      let contentHTML = '';
+      switch (section) {
+        case 'profile':
+          contentHTML = `
+            <a-text value="Nandini Lashkari\nImmersive Technology Developer" color="#0ff" align="center" width="4" position="0 0.2 0" class="holo-glow"></a-text>
+            <a-text value="Email | LinkedIn | GitHub" color="#fff" align="center" width="4" position="0 0 0" class="holo-glow"></a-text>
+            <a-entity position="0 -0.1 0">
+              <a-link href="mailto:nandini@example.com" title="Email" color="#0ff" position="-0.3 0 0"></a-link>
+              <a-link href="https://linkedin.com/in/nandinilashkari" title="LinkedIn" color="#0ff" position="0 0 0"></a-link>
+              <a-link href="https://github.com/nandinilashkari" title="GitHub" color="#0ff" position="0.3 0 0"></a-link>
+            </a-entity>
+          `;
+          break;
+        case 'experience':
+          contentHTML = `
+            <a-text value="Experience Timeline" color="#0ff" align="center" width="4" position="0 0.3 0"></a-text>
+            <a-cylinder position="0 0 0" radius="0.01" height="0.6" color="#0ff" opacity="0.5"></a-cylinder>
+            <a-text value="2024: Meta AR/VR Intern\nImmersive prototypes with Unity & AR Foundation" color="#fff" align="center" width="3" position="0 0.15 0.01"></a-text>
+            <a-text value="2023: Google XR Research Intern\nAI/ML in immersive spaces (Gemini API)" color="#fff" align="center" width="3" position="0 -0.15 0.01"></a-text>
+          `;
+          break;
+        case 'projects':
+          contentHTML = `
+            <a-text value="Key Projects" color="#0ff" align="center" width="4" position="0 0.3 0"></a-text>
+            <a-box position="-0.4 0 0" width="0.6" height="0.2" depth="0.02" color="#000" opacity="0.6"></a-box>
+            <a-text value="AI InterviewBot\nGemini API + 3D Avatar" color="#0ff" position="-0.4 0.08 0.01" width="2.5"></a-text>
+            <a-sphere position="0.4 0 0" radius="0.1" color="#0ff" opacity="0.7" animation="property: rotation; to: 0 360 0; dur: 10000; loop: true"></a-sphere> <!-- Stylized avatar -->
+            <a-text value="VR Interior Design\nUnity WebGL Walkthrough" color="#0ff" position="-0.4 -0.2 0.01" width="2.5"></a-text>
+            <a-text value="AR + IoT\nReal-time Integration" color="#0ff" position="0.4 -0.2 0.01" width="2.5"></a-text>
+          `;
+          break;
+        case 'skills':
+          contentHTML = `
+            <a-text value="Tech Stack" color="#0ff" align="center" width="4" position="0 0.3 0"></a-text>
+            <a-entity position="0 0 0" animation="property: rotation; to: 0 360 0; dur: 20000; loop: true">
+              <a-box position="0 0.2 0" width="0.2" height="0.2" depth="0.1" color="#0ff" opacity="0.6"><a-text value="Unity" color="#fff" align="center" width="2"></a-text></a-box>
+              <a-box position="0.3 0 0" width="0.2" height="0.2" depth="0.1" color="#0ff" opacity="0.6"><a-text value="WebGL" color="#fff" align="center" width="2"></a-text></a-box>
+              <a-box position="0 -0.2 0" width="0.2" height="0.2" depth="0.1" color="#0ff" opacity="0.6"><a-text value="C#" color="#fff" align="center" width="2"></a-text></a-box>
+              <a-box position="-0.3 0 0" width="0.2" height="0.2" depth="0.1" color="#0ff" opacity="0.6"><a-text value="Python" color="#fff" align="center" width="2"></a-text></a-box>
+            </a-entity>
+          `;
+          break;
+        case 'research':
+          contentHTML = `
+            <a-plane width="1" height="0.8" color="#000" opacity="0.5" position="0 0 -0.01"></a-plane>
+            <a-text value="Research & Patents\n• Holographic Telepresence (Patent Pending)\n• Gesture Rec. in AR (IEEE 2024)\n• AI UI in XR (ACM 2025)\n• Springer: AI Avatars (2025)\n• YOLOv8 + AR Foundation" 
+                     color="#0ff" width="3" align="center" position="0 0.2 0.01" wrap-count="40" class="holo-glow"></a-text>
+          `;
+          break;
+      }
+      contentEl.innerHTML = contentHTML;
     }
 
-    // Button click handler
-    document.querySelectorAll('.button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        clearContent();
-        const section = btn.getAttribute('data-section');
+    // Fallback: If no XR, show 2D version after 5s
+    setTimeout(() => {
+      if (!sceneEl.is('entered')) {
+        enterAR();
+      }
+    }, 5000);
 
-        if (section === 'profile') {
-          showContent(`
-            <a-entity position="0 0.4 0">
-              <a-text value="Nandini Lashkari\nImmersive Technology Developer" color="#0ff" align="center" width="3" position="0 0.3 0"></a-text>
-              <a-plane color="#000" opacity="0.6" width="1.2" height="0.8" position="0 0 -0.01"></a-plane>
-            </a-entity>
-            <a-plane position="0 0 0" width="0.25" height="0.25" material="src:#github" animation__rotate="property:rotation; to:0 360 0; dur:10000; loop:true" event-set__click="_event: click; _target: window; open: https://github.com/nandinilashkari"></a-plane>
-            <a-plane position="-0.3 -0.2 0" width="0.25" height="0.25" material="src:#linkedin" event-set__click="_event: click; _target: window; open: https://linkedin.com/in/nandinilashkari"></a-plane>
-            <a-plane position="0.3 -0.2 0" width="0.25" height="0.25" material="src:#mail" event-set__click="_event: click; _target: window; open: mailto:nandini@example.com"></a-plane>
-          `);
-        }
-
-        else if (section === 'experience') {
-          showContent(`
-            <a-entity position="0 0.2 0">
-              <a-text value="Experience Timeline" color="#0ff" align="center" width="4"></a-text>
-              <a-cylinder position="-0.3 -0.1 0" radius="0.01" height="0.6" color="#0ff" opacity="0.7"></a-cylinder>
-              <a-text value="2024 → Meta\nAR/VR Intern" align="left" width="3" position="-0.5 -0.1 0.01" color="#fff"></a-text>
-              <a-text value="2023 → Google\nXR Research Intern" align="left" width="3" position="-0.5 -0.35 0.01" color="#fff"></a-text>
-            </a-entity>
-          `);
-        }
-
-        else if (section === 'projects') {
-          showContent(`
-            <a-entity position="0 0.3 0">
-              <a-text value="Key Projects" color="#0ff" align="center" width="4"></a-text>
-              
-              <!-- AI InterviewBot -->
-              <a-entity position="-0.4 -0.1 0">
-                <a-box depth="0.02" width="0.6" height="0.3" color="#000" opacity="0.7"></a-box>
-                <a-text value="AI InterviewBot\nGemini API + 3D Avatar" width="3" color="#0ff" position="0 0.08 0.02"></a-text>
-              </a-entity>
-              <a-gltf-model src="#avatar" scale="0.4 0.4 0.4" position="0.4 0 0" rotation="0 180 0" animation="property: rotation; to: 0 360 0; dur: 15000; loop: true"></a-gltf-model>
-
-              <!-- VR Interior Design -->
-              <a-entity position="-0.4 -0.4 0">
-                <a-box depth="0.02" width="0.6" height="0.2" color="#000" opacity="0.7"></a-box>
-                <a-text value="VR Interior Design\nUnity WebGL Walkthrough" width="3" color="#0ff" position="0 0.05 0.02"></a-text>
-              </a-entity>
-
-              <!-- AR + IoT -->
-              <a-entity position="0.4 -0.4 0">
-                <a-box depth="0.02" width="0.6" height="0.2" color="#000" opacity="0.7"></a-box>
-                <a-text value="AR + IoT Dashboard\nReal-time Device Control" width="3" color="#0ff" position="0 0.05 0.02"></a-text>
-              </a-entity>
-            </a-entity>
-          `);
-        }
-
-        else if (section === 'skills') {
-          showContent(`
-            <a-entity position="0 0.3 0">
-              <a-text value="Tech Stack" color="#0ff" align="center" width="4"></a-text>
-              <a-entity animation="property: rotation; to: 0 360 0; dur: 30000; loop: true">
-                <a-box position="0 0.3 0" depth="0.15" width="0.3" height="0.15" color="#0ff" opacity="0.6"><a-text value="Unity" align="center" color="#fff" width="2"></a-text></a-box>
-                <a-box position="0.3 0 0" depth="0.15" width="0.3" height="0.15" color="#0ff" opacity="0.6"><a-text value="Unreal" align="center" color="#fff" width="2"></a-text></a-box>
-                <a-box position="0 -0.3 0" depth="0.15" width="0.3" height="0.15" color="#0ff" opacity="0.6"><a-text value="Blender" align="center" color="#fff" width="2"></a-text></a-box>
-                <a-box position="-0.3 0 0" depth="0.15" width="0.3" height="0.15" color="#0ff" opacity="0.6"><a-text value="AR Foundation" align="center" color="#fff" width="2"></a-text></a-box>
-                <a-box position="0 0 -0.3" depth="0.15" width="0.3" height="0.15" color="#0ff" opacity="0.6"><a-text value="WebGL" align="center" color="#fff" width="2"></a-text></a-box>
-                <a-box position="0.2 0.2 -0.2" depth="0.15" width="0.3" height="0.15" color="#0ff" opacity="0.6"><a-text value="C#" align="center" color="#fff" width="2"></a-text></a-box>
-                <a-box position="-0.2 -0.2 0.2" depth="0.15" width="0.3" height="0.15" color="#0ff" opacity="0.6"><a-text value="Python" align="center" color="#fff" width="2"></a-text></a-box>
-              </a-entity>
-            </a-entity>
-          `);
-        }
-
-        else if (section === 'research') {
-          showContent(`
-            <a-entity position="0 0.4 0">
-              <a-plane width="1.2" height="1" color="#000" opacity="0.7" material="side:double"></a-plane>
-              <a-text value="Research & Patents\n\n• Holographic Telepresence Framework (US Patent Pending)\n• Real-time Gesture Recognition in AR (IEEE 2024)\n• AI-Driven Adaptive UI in XR (ACM 2025)\n• Multi-modal Interaction in Mixed Reality\n• Springer Publication (2025) - AI Avatars in Education\n• YOLOv8 Integration with AR Foundation" 
-                      color="#0ff" width="4" align="center" wrap-count="50" position="0 0.3 0.01"></a-text>
-            </a-entity>
-          `);
-        }
-      });
-    });
-
-    // External link handler
-    window.open = function(url) {
-      window.location.href = url;
-    };
+    // Hide hint if no AR
+    if (!navigator.xr) {
+      document.getElementById('hint').innerHTML = 'AR not supported—viewing interactive 2D mode';
+    }
   </script>
 </body>
 </html>
